@@ -407,7 +407,7 @@ function Client:handle_body(body)
   end
   log.debug('rpc.receive', decoded)
 
-  if type(decoded.method) == 'string' and decoded.id then
+  if decoded ~= nil and type(decoded.method) == 'string' and decoded.id then
     local err --- @type lsp.ResponseError|nil
     -- Schedule here so that the users functions don't trigger an error and
     -- we can still use the result.
@@ -455,7 +455,7 @@ function Client:handle_body(body)
       end)()
     end)
     -- This works because we are expecting vim.NIL here
-  elseif decoded.id and (decoded.result ~= vim.NIL or decoded.error ~= vim.NIL) then
+  elseif decoded ~= nil and decoded.id and (decoded.result ~= vim.NIL or decoded.error ~= vim.NIL) then
     -- We sent a number, so we expect a number.
     local result_id = assert(tonumber(decoded.id), 'response id must be a number')
 
@@ -514,7 +514,7 @@ function Client:handle_body(body)
       self:on_error(M.client_errors.NO_RESULT_CALLBACK_FOUND, decoded)
       log.error('No callback found for server response id ' .. result_id)
     end
-  elseif type(decoded.method) == 'string' then
+  elseif decoded ~= nil and type(decoded.method) == 'string' then
     -- Notification
     self:try_call(
       M.client_errors.NOTIFICATION_HANDLER_ERROR,
